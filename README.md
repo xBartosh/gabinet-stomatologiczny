@@ -5,7 +5,7 @@
 2. **Download MYSQL Workbench** - follow [this tutorial](https://www.youtube.com/watch?v=GoQq5D_ntiY)
    - Set the `password` for MYSQL Workbench local connection to `admin`
    - You can set your own password, but remember to set property `password` in application.yml to `your password`
-   - Create a `schema` in MYSQL Workbench named `gabinet-stomatologiczny`
-   - Please `DO NOT` commit and push your changes in `application.yml` file! This is a config file
+   - Create a `schema` in MYSQL Workbench local connection named `gabinet-stomatologiczny`
+   - Please `DO NOT` push your changes in `application.yml` file! This is a config file
 3. **Preferable IDE is IntelliJ** - [link to download](https://www.jetbrains.com/idea/download/#section=windows)
    - You can easily apply for Ultimate Edition for students [here](https://www.jetbrains.com/shop/eform/students)
