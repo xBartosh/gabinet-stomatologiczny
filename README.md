@@ -9,3 +9,7 @@
    - Please `DO NOT` push your changes in `application.yml` file! This is a config file
 3. **Preferable IDE is IntelliJ** - [link to download](https://www.jetbrains.com/idea/download/#section=windows)
    - You can easily apply for Ultimate Edition for students [here](https://www.jetbrains.com/shop/eform/students)
+
+### How to run the app:
+1. Run the main class `GabinetStomatologicznyApplication.java`
+2. Open web browser with url `localhost:8080`
