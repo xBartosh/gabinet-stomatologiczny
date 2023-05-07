@@ -11,11 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import pl.gabinet.gabinetstomatologiczny.role.RoleType;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.Stream;
 
 @Configuration
 @EnableWebSecurity
@@ -31,25 +26,35 @@ public class SpringSecurity {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        HashMap<Object, Object> RoleName;
         http.csrf().disable()
-                .authorizeHttpRequests((authorize) ->
-                        authorize.requestMatchers("/register/**").permitAll()
-                                .requestMatchers("/").permitAll()
-                )
-//                .authorizeHttpRequests((authorize) ->
-//                        authorize.requestMatchers("/").authenticated()) This is how to authorize other requests
-                .formLogin(
-                        form -> form
-                                .loginPage("/login")
-                                .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/")
-                                .permitAll()
-                ).logout(
-                        logout -> logout
-                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                                .permitAll()
-                );
+                .authorizeHttpRequests()
+                .requestMatchers(
+                        "/surgery/**",
+                        "/api/**",
+                        "/swagger-ui/index.html",
+                        "/swagger-ui/index.html**").authenticated()
+                .requestMatchers(
+                        "/register/**", "/",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html",
+                        "/bus/v3/api-docs/**").permitAll()
+                .and()
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .permitAll());
         return http.build();
     }
 

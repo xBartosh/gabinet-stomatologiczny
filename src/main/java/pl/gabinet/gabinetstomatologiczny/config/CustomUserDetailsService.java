@@ -12,6 +12,7 @@ import pl.gabinet.gabinetstomatologiczny.user.UserRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,12 +26,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        Optional<User> user = userRepository.findByEmail(email);
 
-        if (user != null) {
-            return new org.springframework.security.core.userdetails.User(user.getEmail(),
-                    user.getPassword(),
-                    mapRolesToAuthorities(user.getRoles()));
+        if (user.isPresent()) {
+            return new org.springframework.security.core.userdetails.User(user.get().getEmail(),
+                    user.get().getPassword(),
+                    mapRolesToAuthorities(user.get().getRoles()));
         } else {
             throw new UsernameNotFoundException("Invalid username or password.");
         }

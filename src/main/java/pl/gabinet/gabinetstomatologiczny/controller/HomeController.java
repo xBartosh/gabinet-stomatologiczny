@@ -22,17 +22,17 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(){
+    public String home() {
         return "index";
     }
 
     @GetMapping("/login")
-    public String login(){
+    public String login() {
         return "login";
     }
 
     @GetMapping("/register")
-    public String register(Model model){
+    public String register(Model model) {
         UserDto user = new UserDto();
         model.addAttribute("user", user);
         return "register";
@@ -41,26 +41,20 @@ public class HomeController {
     @PostMapping("/register/save")
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
                                BindingResult result,
-                               Model model){
+                               Model model) {
         User existingUser = userService.findUserByEmail(userDto.getEmail());
 
-        if(existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()){
+        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
             result.rejectValue("email", null,
                     "There is already an account registered with the same email");
         }
 
-        if(result.hasErrors()){
+        if (result.hasErrors()) {
             model.addAttribute("user", userDto);
             return "/register";
         }
 
         userService.saveUser(userDto);
         return "redirect:/register?success";
-    }
-
-    @GetMapping("/hello")
-    @RolesAllowed({RoleType.Fields.PATIENT, RoleType.Fields.DOCTOR, RoleType.Fields.ADMIN})
-    public String hello(){
-        return "hello";
     }
 }

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Zabiegi</title>
+    <link rel="stylesheet" href="../css/surgeries.css" th:href="@{/css/surgeries.css}">
+</head>
+<body>
+<div class="container">
+    <ul th:each="surgery : ${surgeries}">
+        <li th:text="|${surgery.getName()}, cena: ${surgery.getPrice()}|"></li>
+    </ul>
+    <a th:href="@{/surgery/add}">Dodaj zabieg</a>
+    <form action="/api/user/add-money" method="post">
+        <input type="number" name="value">
+        <button type="submit">Dodaj</button>
+    </form>
+</div>
+</body>
+</html>
