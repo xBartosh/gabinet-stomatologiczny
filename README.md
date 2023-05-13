@@ -14,3 +14,4 @@
 1. Run the main class `GabinetStomatologicznyApplication.java`
 2. Open web browser with url `localhost:8080`
 3. To view documentation, go to `localhost:8080/swagger-ui/index.html`
+4. 
