@@ -1,0 +1,291 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class CustomUserDetailsService {
+  - userRepository: UserRepository
+  + loadUserByUsername(String): UserDetails
+  - mapRolesToAuthorities(List<Role>): Collection<GrantedAuthority>
+}
+class GabinetStomatologicznyApplication {
+  + main(String[]): void
+}
+class HomeController {
+  - userService: UserService
+  + registration(UserDto, BindingResult, Model): String
+  + home(): String
+  + register(Model): String
+  + login(): String
+}
+enum Message << enumeration >> {
+  + NEW_VISIT: 
+  + PAY_VISIT: 
+  + CANCEL_VISIT: 
+  + ADD_BALANCE: 
+  + RESCHEDULE_VISIT: 
+  - message: String
+  + valueOf(String): Message
+  + values(): Message[]
+  + getMessage(): String
+}
+class Notification {
+  - id: Long
+  - recipient: User
+  - isRead: Boolean
+  - message: String
+  - timestamp: LocalDateTime
+  + getId(): Long
+  + getMessage(): String
+  + getRecipient(): User
+  + getIsRead(): Boolean
+  + builder(): NotificationBuilder
+  + setTimestamp(LocalDateTime): void
+  + getTimestamp(): LocalDateTime
+  + setId(Long): void
+  + setMessage(String): void
+  + setRecipient(User): void
+  + setIsRead(Boolean): void
+}
+class NotificationAPI {
+  - notificationService: NotificationService
+  + findUnreadNotificationsForLoggedInUser(Principal): ResponseEntity<?>
+  + findNotificationsForLoggedInUser(Principal): ResponseEntity<?>
+  + readNotification(Long): ResponseEntity<?>
+}
+interface NotificationRepository << interface >> {
+  + findAllByRecipient(User): List<Notification>
+  + findAllByRecipientAndIsReadEquals(User, boolean): List<Notification>
+}
+class NotificationService {
+  - userService: UserService
+  - notificationRepository: NotificationRepository
+  + notify(String, User): void
+  + readNotification(Long): void
+  + findAllUnreadNotificationsForUser(String): List<Notification>
+  + findAllNotificationsForUser(String): List<Notification>
+}
+class OpenApiConfig
+class Role {
+  - id: Long
+  - roleType: RoleType
+  - users: List<User>
+  + getId(): Long
+  + getRoleType(): RoleType
+  + getUsers(): List<User>
+  + setId(Long): void
+  + setRoleType(RoleType): void
+  + setUsers(List<User>): void
+}
+interface RoleRepository << interface >> {
+  + findByRoleType(RoleType): Role
+}
+enum RoleType << enumeration >> {
+  + ROLE_PATIENT: 
+  + ROLE_ADMIN: 
+  + ROLE_DOCTOR: 
+  + values(): RoleType[]
+  + valueOf(String): RoleType
+  + getRoleType(String): RoleType
+}
+class SpringSecurity {
+  - userDetailsService: UserDetailsService
+  + passwordEncoder(): PasswordEncoder
+  + filterChain(HttpSecurity): SecurityFilterChain
+  + configureGlobal(AuthenticationManagerBuilder): void
+}
+class Surgery {
+  - price: Double
+  - id: Long
+  - name: String
+  + getId(): Long
+  + getName(): String
+  + getPrice(): Double
+  + setId(Long): void
+  + setName(String): void
+  + setPrice(Double): void
+  + builder(): SurgeryBuilder
+  + toString(): String
+}
+class SurgeryAPI {
+  - surgeryService: SurgeryService
+  + deleteSurgery(String): ResponseEntity<String>
+  + addSurgery(String, double): ResponseEntity<?>
+  + findAllSurgeries(): ResponseEntity<List<Surgery>>
+  + findSurgeryByName(String): ResponseEntity<Surgery>
+  + editSurgeryPrice(String, double): ResponseEntity<Surgery>
+}
+class SurgeryController {
+  - surgeryService: SurgeryService
+  + surgeries(SecurityContextHolderAwareRequestWrapper): String
+  + surgeries(Model): String
+}
+class SurgeryNotFoundException
+interface SurgeryRepository << interface >> {
+  + findByName(String): Optional<Surgery>
+}
+class SurgeryService {
+  - LOGGER: Logger
+  - surgeryRepository: SurgeryRepository
+  + deleteSurgery(String): boolean
+  + findSurgeryByName(String): Optional<Surgery>
+  + findAllSurgeries(): List<Surgery>
+  + editSurgeryPrice(String, double): Optional<Surgery>
+  + getPriceForSurgeries(List<Surgery>): double
+  + addSurgery(String, double): Surgery
+}
+class User {
+  - lastName: String
+  - password: String
+  - id: Long
+  - firstName: String
+  - email: String
+  - balance: Double
+  - roles: List<Role>
+  + getBalance(): Double
+  + getId(): Long
+  + setEmail(String): void
+  + setPassword(String): void
+  + setRoles(List<Role>): void
+  + getFirstName(): String
+  + getLastName(): String
+  + setFirstName(String): void
+  + builder(): UserBuilder
+  + getEmail(): String
+  + getPassword(): String
+  + getRoles(): List<Role>
+  + setBalance(Double): void
+  + setLastName(String): void
+  + setId(Long): void
+  + payAndGet(double): double
+  + addBalanceAndGet(double): double
+}
+class UserAPI {
+  - userService: UserService
+  + addBalance(double, Principal, SecurityContextHolderAwareRequestWrapper): ResponseEntity<?>
+  + findDoctors(): ResponseEntity<List<User>>
+  + getBalance(Principal): ResponseEntity<?>
+}
+class UserDto {
+  - email: String
+  - firstName: String
+  - lastName: String
+  - password: String
+  - id: Long
+  - roleType: RoleType
+  + getLastName(): String
+  + getId(): Long
+  + getFirstName(): String
+  + getEmail(): String
+  + setPassword(String): void
+  + setEmail(String): void
+  + setRoleType(RoleType): void
+  + getPassword(): String
+  + getRoleType(): RoleType
+  + setId(Long): void
+  + setFirstName(String): void
+  + setLastName(String): void
+}
+interface UserRepository << interface >> {
+  + findByEmail(String): Optional<User>
+  + findByRolesIn(List<Role>): List<User>
+}
+class UserService {
+  - surgeryService: SurgeryService
+  - userRepository: UserRepository
+  - passwordEncoder: PasswordEncoder
+  - roleRepository: RoleRepository
+  + saveUser(UserDto): void
+  + getBalance(String): double
+  + addBalance(String, double): double
+  + findUserByEmail(String): Optional<User>
+  + findUsersByRoleName(String): List<User>
+  + pay(String, List<Surgery>): double
+  - createRoleIfDoesNotExist(RoleType): Role
+}
+class Visit {
+  - id: Long
+  - patient: User
+  - start: LocalDateTime
+  - doctor: User
+  - surgeries: List<Surgery>
+  - end: LocalDateTime
+  - paid: boolean
+  + getId(): Long
+  + setPatient(User): void
+  + setEnd(LocalDateTime): void
+  + getPatient(): User
+  + getDoctor(): User
+  + setPaid(boolean): void
+  + builder(): VisitBuilder
+  + setSurgeries(List<Surgery>): void
+  + setStart(LocalDateTime): void
+  + getSurgeries(): List<Surgery>
+  + getStart(): LocalDateTime
+  + getEnd(): LocalDateTime
+  + isPaid(): boolean
+  + setDoctor(User): void
+  + setId(Long): void
+}
+class VisitAPI {
+  - visitService: VisitService
+  + findVisitsForDoctor(Long): ResponseEntity<?>
+  + findVisitsForUser(Principal): ResponseEntity<?>
+  + rescheduleVisit(Long, LocalDateTime): ResponseEntity<?>
+  + findVisitsForPatient(Long): ResponseEntity<?>
+  + scheduleVisitAsPatient(Long, LocalDateTime, List<String>, Principal): ResponseEntity<?>
+  + cancelVisit(Long): ResponseEntity<?>
+  + scheduleVisitAsDoctor(Long, LocalDateTime, List<String>, Principal): ResponseEntity<?>
+  + findVisitById(Long): ResponseEntity<?>
+  + payForVisit(Long): ResponseEntity<?>
+  + findVisitsForDoctorWithin(Long, LocalDateTime, LocalDateTime): ResponseEntity<?>
+}
+class VisitController {
+  - visitService: VisitService
+  + visits(Principal, Model): String
+}
+interface VisitRepository << interface >> {
+  + findByDoctorAndStartGreaterThanEqualAndEndLessThanEqual(User, LocalDateTime, LocalDateTime): List<Visit>
+  + findByDoctorAndStartLessThanEqualAndEndGreaterThanEqual(User, LocalDateTime, LocalDateTime): List<Visit>
+  + findByDoctorAndStartLessThanAndEndGreaterThan(User, LocalDateTime, LocalDateTime): List<Visit>
+  + findByDoctorOrPatient(User, User): List<Visit>
+  + findByPatient(User): List<Visit>
+  + findByDoctor(User): List<Visit>
+}
+class VisitService {
+  - surgeryRepository: SurgeryRepository
+  - userRepository: UserRepository
+  - notificationService: NotificationService
+  - userService: UserService
+  - visitRepository: VisitRepository
+  - DATE_TIME_FORMATTER: DateTimeFormatter
+  - surgeryService: SurgeryService
+  + cancelVisit(Long): void
+  + scheduleVisit(String, Long, List<String>, LocalDateTime, boolean): Visit
+  + payForVisit(Long): void
+  + findVisitById(Long): Visit
+  - isDoctorBusy(User, LocalDateTime, LocalDateTime): boolean
+  + findVisitsForDoctor(Long): List<Visit>
+  + findVisitsForDoctorWithin(Long, LocalDateTime, LocalDateTime): List<Visit>
+  + findVisitsForUser(String): List<Visit>
+  + rescheduleVisit(Long, LocalDateTime): Visit
+  + findVisitsForPatient(Long): List<Visit>
+}
+
+NotificationAPI                   "1" *-[#595959,plain]-> "notificationService\n1" NotificationService               
+NotificationService                -[#595959,dashed]->  Notification                      : "«create»"
+NotificationService               "1" *-[#595959,plain]-> "notificationRepository\n1" NotificationRepository            
+Role                              "1" *-[#595959,plain]-> "roleType\n1" RoleType                          
+SurgeryAPI                        "1" *-[#595959,plain]-> "surgeryService\n1" SurgeryService                    
+SurgeryController                 "1" *-[#595959,plain]-> "surgeryService\n1" SurgeryService                    
+SurgeryService                     -[#595959,dashed]->  Surgery                           : "«create»"
+SurgeryService                    "1" *-[#595959,plain]-> "surgeryRepository\n1" SurgeryRepository                 
+User                              "1" *-[#595959,plain]-> "roles\n*" Role                              
+UserAPI                           "1" *-[#595959,plain]-> "userService\n1" UserService                       
+UserService                       "1" *-[#595959,plain]-> "userRepository\n1" UserRepository                    
+Visit                             "1" *-[#595959,plain]-> "doctor\n1" User                              
+VisitController                   "1" *-[#595959,plain]-> "visitService\n1" VisitService                      
+VisitService                       -[#595959,dashed]->  Visit                             : "«create»"
+VisitService                      "1" *-[#595959,plain]-> "visitRepository\n1" VisitRepository                   
+@enduml
