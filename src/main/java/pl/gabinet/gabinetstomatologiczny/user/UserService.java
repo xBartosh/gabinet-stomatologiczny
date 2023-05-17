@@ -8,6 +8,7 @@ import pl.gabinet.gabinetstomatologiczny.role.RoleType;
 import pl.gabinet.gabinetstomatologiczny.role.RoleRepository;
 import pl.gabinet.gabinetstomatologiczny.surgery.Surgery;
 import pl.gabinet.gabinetstomatologiczny.surgery.SurgeryRepository;
+import pl.gabinet.gabinetstomatologiczny.surgery.SurgeryService;
 import pl.gabinet.gabinetstomatologiczny.user.dto.UserDto;
 
 import java.util.List;
@@ -19,16 +20,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final SurgeryRepository surgeryRepository;
+    private final SurgeryService surgeryService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
-                       SurgeryRepository surgeryRepository) {
+                       SurgeryService surgeryService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.surgeryRepository = surgeryRepository;
+        this.surgeryService = surgeryService;
     }
 
     public void saveUser(UserDto userDto) {
@@ -47,13 +48,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findUserByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new IllegalArgumentException("User with email " + email + " not found");
-        }
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public List<User> findUsersByRoleName(String roleName) {
@@ -76,17 +72,10 @@ public class UserService {
     }
 
     @Transactional
-    public synchronized double pay(String email, List<String> surgeries) throws IllegalArgumentException, IllegalStateException {
+    public synchronized double pay(String email, List<Surgery> surgeries) throws IllegalArgumentException, IllegalStateException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User with email " + email + " not found"));
-
-        int sumToPay = 0;
-        for (String surgeryName: surgeries) {
-            Surgery srg = surgeryRepository.findByName(surgeryName)
-                    .orElseThrow(() -> new IllegalArgumentException("There is no surgery with name=" + surgeryName));
-            sumToPay += srg.getPrice();
-        }
-        return user.payAndGet(sumToPay);
+        return user.payAndGet(surgeryService.getPriceForSurgeries(surgeries));
     }
 
     private Role createRoleIfDoesNotExist(RoleType roleType) {

@@ -30,6 +30,7 @@ public class SpringSecurity {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/surgery/**",
+                        "/visit/**",
                         "/api/**",
                         "/swagger-ui/index.html",
                         "/swagger-ui/index.html**").authenticated()

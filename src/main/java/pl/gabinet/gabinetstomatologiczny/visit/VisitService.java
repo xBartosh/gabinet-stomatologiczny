@@ -3,35 +3,47 @@ package pl.gabinet.gabinetstomatologiczny.visit;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import pl.gabinet.gabinetstomatologiczny.message.Message;
+import pl.gabinet.gabinetstomatologiczny.notification.NotificationService;
 import pl.gabinet.gabinetstomatologiczny.surgery.Surgery;
 import pl.gabinet.gabinetstomatologiczny.surgery.SurgeryRepository;
+import pl.gabinet.gabinetstomatologiczny.surgery.SurgeryService;
 import pl.gabinet.gabinetstomatologiczny.user.User;
 import pl.gabinet.gabinetstomatologiczny.user.UserRepository;
 import pl.gabinet.gabinetstomatologiczny.user.UserService;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.lang.String.format;
 
 @Service
 public class VisitService {
     private final VisitRepository visitRepository;
     private final UserRepository userRepository;
     private final SurgeryRepository surgeryRepository;
+    private final NotificationService notificationService;
     private final UserService userService;
+    private final SurgeryService surgeryService;
 
-    public VisitService(VisitRepository visitRepository, UserRepository userRepository, SurgeryRepository surgeryRepository, UserService userService) {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public VisitService(VisitRepository visitRepository, UserRepository userRepository, SurgeryRepository surgeryRepository, NotificationService notificationService, UserService userService, SurgeryService surgeryService) {
         this.visitRepository = visitRepository;
         this.userRepository = userRepository;
         this.surgeryRepository = surgeryRepository;
+        this.notificationService = notificationService;
         this.userService = userService;
+        this.surgeryService = surgeryService;
     }
 
     public Visit findVisitById(Long id) {
-        Visit visit = visitRepository.findById(id)
+        return visitRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Visit with id " + id + " not found"));
-        return visit;
     }
 
     public synchronized Visit scheduleVisit(String email, Long userId, List<String> surgeries, LocalDateTime start, boolean isDoctor) {
@@ -65,9 +77,12 @@ public class VisitService {
                     .map(surgeryRepository::findByName)
                     .map(optSurgery -> optSurgery.orElseThrow(() -> new IllegalArgumentException("There is no surgery with the given name.")))
                     .collect(Collectors.toList());
+            notificationService.notify(format(Message.NEW_VISIT.getMessage(), start.format(DATE_TIME_FORMATTER), surgeriesList.stream().map(Surgery::getName).collect(Collectors.joining(", "))), user);
+            notificationService.notify(format(Message.NEW_VISIT.getMessage(), start.format(DATE_TIME_FORMATTER), surgeriesList.stream().map(Surgery::getName).collect(Collectors.joining(", "))), otherUser);
             return visitRepository.save(new Visit(otherUser, user, surgeriesList, start, end));
         }
-        throw new IllegalArgumentException(String.format("Cannot schedule a visit for %s=%s %s, at=%s", userType, user.getFirstName(), user.getLastName(), start));
+
+        throw new IllegalArgumentException(format("Cannot schedule a visit for %s=%s %s, at=%s", userType, user.getFirstName(), user.getLastName(), start));
     }
 
     public List<Visit> findVisitsForUser(String email) {
@@ -100,13 +115,17 @@ public class VisitService {
                 .orElseThrow(() -> new IllegalArgumentException("Visit with id " + visitId + " not found"));
 
         boolean doctorBusy = isDoctorBusy(visit.getDoctor(), newStart, newStart);
+        LocalDateTime actualStart = visit.getStart();
+
         if (!doctorBusy) {
             visit.setStart(newStart);
             visit.setEnd(newStart.plusHours(1));
+            notificationService.notify(format(Message.RESCHEDULE_VISIT.getMessage(), actualStart.format(DATE_TIME_FORMATTER), newStart.format(DATE_TIME_FORMATTER)), visit.getPatient());
+            notificationService.notify(format(Message.RESCHEDULE_VISIT.getMessage(), actualStart.format(DATE_TIME_FORMATTER), newStart.format(DATE_TIME_FORMATTER)), visit.getDoctor());
             return visit;
         }
 
-        throw new IllegalArgumentException(String.format("Cannot reschedule a visit with id=%d, at=%s", visitId, newStart));
+        throw new IllegalArgumentException(format("Cannot reschedule a visit with id=%d, at=%s", visitId, newStart));
     }
 
     @Transactional
@@ -115,8 +134,9 @@ public class VisitService {
                 .orElseThrow(() -> new IllegalArgumentException("Visit with id " + visitId + " not found"));
         if (!visit.isPaid()) {
             userService.pay(visit.getPatient().getEmail(),
-                    visit.getSurgeries().stream().map(Surgery::getName).toList());
+                    visit.getSurgeries());
             visit.setPaid(true);
+            notificationService.notify(format(Message.PAY_VISIT.getMessage(), visit.getStart().format(DATE_TIME_FORMATTER), surgeryService.getPriceForSurgeries(visit.getSurgeries())), visit.getPatient());
         } else {
             throw new IllegalStateException("Visit has already been paid!");
         }
@@ -124,6 +144,10 @@ public class VisitService {
     }
 
     public void cancelVisit(Long visitId) {
+        Visit visit = visitRepository.findById(visitId)
+                .orElseThrow(() -> new IllegalArgumentException("Visit with id " + visitId + " not found"));
+        notificationService.notify(format(Message.CANCEL_VISIT.getMessage(), visit.getStart().format(DATE_TIME_FORMATTER)), visit.getPatient());
+        notificationService.notify(format(Message.CANCEL_VISIT.getMessage(), visit.getStart().format(DATE_TIME_FORMATTER)), visit.getDoctor());
         visitRepository.deleteById(visitId);
     }
 

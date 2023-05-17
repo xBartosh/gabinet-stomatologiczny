@@ -33,7 +33,7 @@ public class SurgeryService {
         LOGGER.info("Going to add new surgery, name={}, price={}", name, price);
         try {
             return surgeryRepository.save(new Surgery(name, price));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Not able to add new surgery with name=%s and price=%.2f", name, price));
         }
     }
@@ -64,5 +64,18 @@ public class SurgeryService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public double getPriceForSurgeries(List<Surgery> surgeries) throws IllegalArgumentException {
+        int sumToPay = 0;
+
+        List<String> surgeriesAsString = surgeries.stream().map(Surgery::getName).toList();
+        for (String surgeryName : surgeriesAsString) {
+            Surgery surgery = surgeryRepository.findByName(surgeryName)
+                    .orElseThrow(() -> new IllegalArgumentException("There is no surgery with name=" + surgeryName));
+            sumToPay += surgery.getPrice();
+        }
+
+        return sumToPay;
     }
 }

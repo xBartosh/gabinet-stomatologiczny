@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul th:each="visit : ${visits}">
+    <li th:text="|Godzina: ${visit.getStart().toString()}, zabieg: ${visit.getSurgeries().get(0)}|" th:attr="data-customdata=${visit.getId()}"></li>
+</ul>
+</body>
+</html>

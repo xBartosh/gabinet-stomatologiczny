@@ -13,6 +13,8 @@ import pl.gabinet.gabinetstomatologiczny.user.User;
 import pl.gabinet.gabinetstomatologiczny.user.UserService;
 import pl.gabinet.gabinetstomatologiczny.user.dto.UserDto;
 
+import java.util.Optional;
+
 @Controller
 public class HomeController {
     private final UserService userService;
@@ -42,9 +44,9 @@ public class HomeController {
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
                                BindingResult result,
                                Model model) {
-        User existingUser = userService.findUserByEmail(userDto.getEmail());
+        Optional<User> existingUser = userService.findUserByEmail(userDto.getEmail());
 
-        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()) {
+        if (existingUser.isPresent() && existingUser.get().getEmail() != null && !existingUser.get().getEmail().isEmpty()) {
             result.rejectValue("email", null,
                     "There is already an account registered with the same email");
         }
