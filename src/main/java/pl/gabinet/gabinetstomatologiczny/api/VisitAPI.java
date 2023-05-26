@@ -78,13 +78,13 @@ public class VisitAPI {
 
     @PostMapping("/schedule/patient")
     @Operation(summary = "Schedule a visit as a patient")
-    public ResponseEntity<?> scheduleVisitAsPatient(@RequestParam Long doctorId,
+    public ResponseEntity<?> scheduleVisitAsPatient(@RequestParam String doctorId,
                                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
                                                @RequestParam List<String> surgeries,
                                                Principal principal){
         String email = principal.getName();
         try {
-            return ResponseEntity.ok(visitService.scheduleVisit(email, doctorId, surgeries, start, false));
+            return ResponseEntity.ok(visitService.scheduleVisit(email, Long.valueOf(doctorId), surgeries, start, false));
         } catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -30,11 +30,6 @@ class VisitControllerTest {
     @Mock
     private Model model;
 
-    @BeforeEach
-    void setUp() {
-        visitController = new VisitController(visitService);
-    }
-
     @Test
     void testVisits() {
         // given

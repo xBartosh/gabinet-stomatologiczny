@@ -1,0 +1,28 @@
+.surgeries {
+    display: flex;
+    flex-direction: column;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.card-body {
+    margin: auto;
+}
+
+#submit {
+    border: 1px solid black;
+    background-color: green;
+    color: white;
+    padding: 5px;
+    margin: 5px;
+    text-align: center;
+}
+
+#submit:hover {
+    cursor: pointer;
+}

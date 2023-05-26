@@ -1,6 +1,7 @@
 package pl.gabinet.gabinetstomatologiczny.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -31,6 +32,7 @@ public class SpringSecurity {
                 .requestMatchers(
                         "/surgery/**",
                         "/visit/**",
+                        "/user/**",
                         "/api/**",
                         "/swagger-ui/index.html",
                         "/swagger-ui/index.html**").authenticated()
@@ -47,6 +49,11 @@ public class SpringSecurity {
                         "/webjars/**",
                         "/swagger-ui.html",
                         "/bus/v3/api-docs/**").permitAll()
+                .requestMatchers(
+                        "/resources/**",
+                        "/css/**",
+                        "/js/**"
+                ).permitAll()
                 .and()
                 .formLogin(form -> form
                         .loginPage("/login")
