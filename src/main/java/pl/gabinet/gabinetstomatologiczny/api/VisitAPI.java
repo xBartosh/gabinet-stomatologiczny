@@ -104,7 +104,7 @@ public class VisitAPI {
         }
     }
 
-    @PostMapping
+    @PostMapping("/pay")
     @Operation(summary = "Pay for a visit")
     public ResponseEntity<?> payForVisit(@RequestParam Long visitId) {
         try {

@@ -28,29 +28,39 @@ body {
     padding: 20px;
 }
 
-.container ul {
-    list-style: none;
-    padding: 0;
+form {
+    margin-bottom: 15px;
 }
 
-.container li {
+form label {
+    font-weight: bold;
+}
+
+form input {
     margin-bottom: 10px;
+    padding: 5px;
+    width: 100%;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#message {
+    margin-top: 10px;
     padding: 10px;
     border: 1px solid #dee2e6;
     border-radius: 5px;
     background-color: #fff;
+    color: green;
 }
-
-.container li:last-child {
-    margin-bottom: 0;
-}
-
-.container li::before {
-    content: '\2022'; /* Bullet point */
-    margin-right: 10px;
-}
-
-.container li span {
-    font-weight: bold;
-}
-

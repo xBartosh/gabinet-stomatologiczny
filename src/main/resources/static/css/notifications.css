@@ -1,0 +1,15 @@
+.notification {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.notification-date {
+    font-weight: bold;
+    color: #343a40;
+}
+
+.notification-message {
+    margin-top: 5px;
+}

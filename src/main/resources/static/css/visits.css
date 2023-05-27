@@ -1,3 +1,12 @@
+#balance {
+    margin: auto;
+}
+
+.visit {
+    display: flex;
+}
+
+/* Additional custom styles */
 body {
     background-color: #f8f9fa;
     font-family: Arial, sans-serif;
@@ -28,29 +37,35 @@ body {
     padding: 20px;
 }
 
-.container ul {
-    list-style: none;
-    padding: 0;
+.alert {
+    margin-bottom: 10px;
 }
 
-.container li {
-    margin-bottom: 10px;
+.visit {
+    margin-bottom: 15px;
     padding: 10px;
     border: 1px solid #dee2e6;
     border-radius: 5px;
     background-color: #fff;
 }
 
-.container li:last-child {
-    margin-bottom: 0;
-}
-
-.container li::before {
-    content: '\2022'; /* Bullet point */
-    margin-right: 10px;
-}
-
-.container li span {
+.visit span {
     font-weight: bold;
 }
 
+.visit button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.visit button:hover {
+    background-color: #0056b3;
+}
+
+.paid-label {
+    color: green;
+}

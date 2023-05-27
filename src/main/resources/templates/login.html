@@ -11,57 +11,21 @@
           crossorigin="anonymous">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/}">Registration and Login System</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/register}">Register</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/login}">Login</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/surgery/add}">Dodaj zabieg</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/surgery/all}">Podgląd cennika</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/user/add}">Doładowanie środków</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/visit/all}">Wizyty</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/visit/book}">Zarezerwuj wizytę</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/logout}">Wyloguj się</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<br /><br />
+<th:block th:replace="nav.html"></th:block>
 <div class="container">
     <div class="row">
         <div class="col-md-6 offset-md-3">
 
             <div th:if="${param.error}">
-                <div class="alert alert-danger">Invalid Email or Password</div>
+                <div class="alert alert-danger">Nieprawidłowy email lub hasło</div>
             </div>
             <div th:if="${param.logout}">
-                <div class="alert alert-success"> You have been logged out.</div>
+                <div class="alert alert-success">Pomyślnie wylogowano</div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h2 class="text-center">Login Form</h2>
+                    <h2 class="text-center">Logowanie</h2>
                 </div>
                 <div class="card-body">
                     <form method="post" role="form" th:action="@{/login}" class="form-horizontal">

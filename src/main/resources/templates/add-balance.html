@@ -9,45 +9,10 @@
           rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
+    <link th:href="@{/css/add-balance.css}" rel="stylesheet">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/}">Gabinet stomatologiczny</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/register}">Register</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/login}">Login</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/surgery/add}">Dodaj zabieg</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/surgery/all}">Podgląd cennika</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/user/add}">Doładowanie środków</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/visit/all}">Wizyty</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/visit/book}">Zarezerwuj wizytę</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link active" aria-current="page" th:href="@{/logout}">Wyloguj się</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<br /><br />
+<th:block th:replace="nav.html"></th:block>
 <div class="container">
         <div class="row col-md-8 offset-md-2">
             <div class="card">
@@ -55,14 +20,16 @@
                     <h2 class="text-center">Doładuj konto</h2>
                 </div>
                 <div class="card-body">
-                    <form method="post" role="form" th:action="@{/api/user/add-balance}">
+                    <form id="balance-form" method="post" role="form" th:action="@{/api/user/add-balance}">
                         <label for="value">Kwota</label>
                         <input type="number" min="0" placeholder="10" name="value" id="value">
                         <button type="submit">Doładuj</button>
                     </form>
+                    <div id="message"></div>
                 </div>
             </div>
         </div>
 </div>
+<script th:src="@{/js/add-balance.js}"></script>
 </body>
 </html>

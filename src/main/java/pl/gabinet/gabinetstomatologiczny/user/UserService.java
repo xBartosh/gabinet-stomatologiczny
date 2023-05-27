@@ -3,11 +3,12 @@ package pl.gabinet.gabinetstomatologiczny.user;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.gabinet.gabinetstomatologiczny.message.Message;
+import pl.gabinet.gabinetstomatologiczny.notification.NotificationService;
 import pl.gabinet.gabinetstomatologiczny.role.Role;
 import pl.gabinet.gabinetstomatologiczny.role.RoleType;
 import pl.gabinet.gabinetstomatologiczny.role.RoleRepository;
 import pl.gabinet.gabinetstomatologiczny.surgery.Surgery;
-import pl.gabinet.gabinetstomatologiczny.surgery.SurgeryRepository;
 import pl.gabinet.gabinetstomatologiczny.surgery.SurgeryService;
 import pl.gabinet.gabinetstomatologiczny.user.dto.UserDto;
 
@@ -21,15 +22,17 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final SurgeryService surgeryService;
+    private final NotificationService notificationService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
-                       SurgeryService surgeryService) {
+                       SurgeryService surgeryService, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.surgeryService = surgeryService;
+        this.notificationService = notificationService;
     }
 
     public void saveUser(UserDto userDto) {
@@ -52,6 +55,13 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public boolean isUserDoctor(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new IllegalArgumentException("User with email " + email + " not found"));
+        List<Role> roles = user.getRoles();
+        return roles.stream().anyMatch(role -> role.getRoleType().equals(RoleType.ROLE_DOCTOR));
+    }
+
     public List<User> findUsersByRoleName(String roleName) {
         RoleType roleType = RoleType.getRoleType(roleName);
         Role role = roleRepository.findByRoleType(roleType);
@@ -68,7 +78,9 @@ public class UserService {
     public double addBalance(String email, double value) throws IllegalArgumentException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()-> new IllegalArgumentException("User with email " + email + " not found"));
-        return user.addBalanceAndGet(value);
+        double addedBalance = user.addBalanceAndGet(value);
+        notificationService.notify(String.format(Message.ADD_BALANCE.getMessage(), value), user);
+        return addedBalance;
     }
 
     @Transactional

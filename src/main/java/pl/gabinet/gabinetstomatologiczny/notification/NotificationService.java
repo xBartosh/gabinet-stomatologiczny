@@ -1,6 +1,7 @@
 package pl.gabinet.gabinetstomatologiczny.notification;
 
 import jakarta.transaction.Transactional;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import pl.gabinet.gabinetstomatologiczny.user.User;
 import pl.gabinet.gabinetstomatologiczny.user.UserService;
@@ -13,7 +14,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserService userService;
 
-    public NotificationService(NotificationRepository notificationRepository, UserService userService) {
+    public NotificationService(NotificationRepository notificationRepository, @Lazy UserService userService) {
         this.notificationRepository = notificationRepository;
         this.userService = userService;
     }

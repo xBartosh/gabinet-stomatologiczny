@@ -36,16 +36,22 @@ public class VisitController {
     public String visits(Principal principal, Model model) {
         String email = principal.getName();
         List<Visit> visits = visitService.findVisitsForUser(email);
+        double balance = userService.getBalance(principal.getName());
         model.addAttribute("visits", visits);
+        model.addAttribute("balance", balance);
+        model.addAttribute("user", userService.findUserByEmail(principal.getName()).get());
         return "visits";
     }
 
     @GetMapping("/book")
-    public String book(Model model) {
+    public String book(Principal principal, Model model) {
         List<String> surgeries = surgeryService.findAllSurgeries().stream().map(Surgery::getName).toList();
         List<User> doctors = userService.findUsersByRoleName(RoleType.ROLE_DOCTOR.name());
+        List<User> patients = userService.findUsersByRoleName(RoleType.ROLE_PATIENT.name());
         model.addAttribute("surgeries", surgeries);
         model.addAttribute("doctors", doctors);
+        model.addAttribute("isDoctor", userService.isUserDoctor(principal.getName()));
+        model.addAttribute("patients", patients);
         model.addAttribute("start", LocalDateTime.now().format(DATE_TIME_FORMATTER));
         return "book";
     }
