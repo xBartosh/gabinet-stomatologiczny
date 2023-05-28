@@ -30,17 +30,17 @@
                 <div class="card-body">
                     <form method="post" role="form" th:action="@{/login}" class="form-horizontal">
                         <div class="form-group mb-3">
-                            <label class="control-label"> Email</label>
-                            <input type="text" id="username" name="username" class="form-control" placeholder="Enter email address"/>
+                            <label class="control-label">Email</label>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="adres email"/>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label class="control-label"> Password</label>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter password"/>
+                            <label class="control-label">Hasło</label>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="hasło"/>
                         </div>
                         <div class="form-group mb-3">
-                            <button type="submit" class="btn btn-primary" >Submit</button>
-                            <span>  Not registered? <a th:href="@{/register}"> Register</a></span>
+                            <button type="submit" class="btn btn-primary" >Zaloguj się</button>
+                            <span>  Niezarejestrowany? <a th:href="@{/register}">Zarejestruj się</a></span>
                         </div>
                     </form>
                 </div>

@@ -1,7 +1,5 @@
 package pl.gabinet.gabinetstomatologiczny.controller;
 
-import jakarta.annotation.security.RolesAllowed;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

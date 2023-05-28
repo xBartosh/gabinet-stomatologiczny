@@ -26,17 +26,30 @@
                         <ul>
                             <li class="visit">
                                 <div th:class="surgeries" th:attr="data-customdata=${visit.getId()}">
-                                    <span th:text="|${#temporals.format(visit.getStart(), 'EEEE, d MMMM yyyy, HH:mm')}|"></span>
+                                    <span class="visit-date" th:text="|${#temporals.format(visit.getStart(), 'EEEE, d MMMM yyyy, HH:mm')}|"></span>
                                     <div th:each="surgery : ${visit.getSurgeries()}">
-                                        <div class="surgery" th:attr="data-price=${surgery.getPrice()}" th:text="|zabieg: ${surgery.getName()}, cena: ${surgery.getPrice()}zł|"></div>
+                                        <div class="surgery" th:attr="data-price=${surgery.getPrice()}" th:text="|zabieg: ${surgery.getName()}, lekarz: ${visit.getDoctor().firstName} ${visit.getDoctor().lastName}, cena: ${surgery.getPrice()}zł|"></div>
                                     </div>
                                     <div th:if="${visit.isPaid()}">
                                         <span class="paid-label">Zapłacone</span>
                                     </div>
-                                    <button th:if="${!visit.isPaid() && visit.getDoctor().getId() != user.getId()}" th:attr="data-id=${visit.getId()}">Zapłać</button>
+                                    <button class="pay" th:if="${!visit.isPaid() && visit.getDoctor().getId() != user.getId()}" th:attr="data-id=${visit.getId()}" sec:authorize="hasAuthority('ROLE_PATIENT')">Zapłać</button>
+                                    <button class="edit" th:if="${#temporals.createNow().isBefore(visit.getStart())}" th:attr="data-id=${visit.getId()}">Edytuj wizytę</button>
+                                    <button class="cancel" th:if="${#temporals.createNow().isBefore(visit.getStart())}" th:attr="data-id=${visit.getId()}">Odwołaj wizytę</button>
+                                    <div id="dateModal" class="modal">
+                                        <div class="modal-content">
+                                            <span class="close">&times;</span>
+                                            <h3>Wybierz nowy termin</h3>
+                                            <input type="datetime-local" id="newDateInput">
+                                            <button id="confirmDateBtn">Potwierdź</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </li>
                         </ul>
+                    </div>
+                    <div id="popup">
+                        <div class="popup-message"></div>
                     </div>
                 </div>
             </div>

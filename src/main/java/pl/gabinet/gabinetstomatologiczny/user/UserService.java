@@ -41,6 +41,7 @@ public class UserService {
                 .lastName(userDto.getLastName())
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
+                .balance(0.0)
                 .build();
 
         Role role = roleRepository.findByRoleType(userDto.getRoleType());

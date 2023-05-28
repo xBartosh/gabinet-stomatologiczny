@@ -10,6 +10,7 @@ import pl.gabinet.gabinetstomatologiczny.visit.VisitService;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -17,6 +18,7 @@ import java.util.List;
 @Tag(name = "Visit API")
 public class VisitAPI {
     private final VisitService visitService;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public VisitAPI(VisitService visitService) {
         this.visitService = visitService;
@@ -24,11 +26,11 @@ public class VisitAPI {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get visit by id")
-    public ResponseEntity<?> findVisitById(@PathVariable Long id){
+    public ResponseEntity<?> findVisitById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(visitService.findVisitById(id));
-        } catch(Exception e){
-           return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -66,11 +68,11 @@ public class VisitAPI {
     @GetMapping("/timeframe")
     @Operation(summary = "Get visits for doctor within timeframe")
     public ResponseEntity<?> findVisitsForDoctorWithin(@RequestParam Long doctorId,
-                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
-                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T18:32:28Z")LocalDateTime end) {
+                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
+                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T18:32:28Z") LocalDateTime end) {
         try {
             return ResponseEntity.ok(visitService.findVisitsForDoctorWithin(doctorId, start, end));
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
@@ -79,13 +81,13 @@ public class VisitAPI {
     @PostMapping("/schedule/patient")
     @Operation(summary = "Schedule a visit as a patient")
     public ResponseEntity<?> scheduleVisitAsPatient(@RequestParam String doctorId,
-                                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
-                                               @RequestParam List<String> surgeries,
-                                               Principal principal){
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
+                                                    @RequestParam List<String> surgeries,
+                                                    Principal principal) {
         String email = principal.getName();
         try {
             return ResponseEntity.ok(visitService.scheduleVisit(email, Long.valueOf(doctorId), surgeries, start, false));
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -93,13 +95,13 @@ public class VisitAPI {
     @PostMapping("/schedule/doctor")
     @Operation(summary = "Schedule a visit as a doctor")
     public ResponseEntity<?> scheduleVisitAsDoctor(@RequestParam Long patientId,
-                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
-                                           @RequestParam List<String> surgeries,
-                                           Principal principal){
+                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime start,
+                                                   @RequestParam List<String> surgeries,
+                                                   Principal principal) {
         String email = principal.getName();
         try {
             return ResponseEntity.ok(visitService.scheduleVisit(email, patientId, surgeries, start, true));
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -110,7 +112,7 @@ public class VisitAPI {
         try {
             visitService.payForVisit(visitId);
             return ResponseEntity.ok("Successfully paid for a visit with id=" + visitId);
-        }  catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -118,9 +120,13 @@ public class VisitAPI {
     @PutMapping("/reschedule")
     @Operation(summary = "Reschedule a visit")
     public ResponseEntity<?> rescheduleVisit(@RequestParam Long visitId,
-                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") LocalDateTime newStart) {
+                                             @RequestParam @Parameter(description = "String in format: yyyy-MM-ddTHH:mm:ssZ", example = "2017-07-21T17:32:28Z") String newStart) {
+        LocalDateTime newStartTime = LocalDateTime.parse(newStart, DATE_TIME_FORMATTER);
+        if (newStartTime.isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().build();
+        }
         try {
-            return ResponseEntity.ok(visitService.rescheduleVisit(visitId, newStart));
+            return ResponseEntity.ok(visitService.rescheduleVisit(visitId, LocalDateTime.parse(newStart, DATE_TIME_FORMATTER)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -132,7 +138,7 @@ public class VisitAPI {
         try {
             visitService.cancelVisit(visitId);
             return ResponseEntity.ok("Successfully canceled a visit with id=" + visitId);
-        } catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

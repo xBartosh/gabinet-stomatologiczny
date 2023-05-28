@@ -52,7 +52,10 @@ public class SpringSecurity {
                 .requestMatchers(
                         "/resources/**",
                         "/css/**",
-                        "/js/**"
+                        "/js/**",
+                        "/image/**",
+                        "*.jpg",
+                        "*.png"
                 ).permitAll()
                 .and()
                 .formLogin(form -> form
