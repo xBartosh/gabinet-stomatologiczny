@@ -1,4 +1,5 @@
-# Gabinet stomatologiczny
+# Gabinet stomatologiczny (dentist app)
+This project is designed solely for my university course. It's purely academic and not intended for any commercial use.
 
 ### What you need to run this app:
 1. **Java 17.0.4 JDK installed** - follow [this tutorial](https://www.youtube.com/watch?v=pqqY9jakmFw)
@@ -14,4 +15,3 @@
 1. Run the main class `GabinetStomatologicznyApplication.java`
 2. Open web browser with url `localhost:8080`
 3. To view documentation, go to `localhost:8080/swagger-ui/index.html`
-4. 
